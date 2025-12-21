@@ -7,116 +7,128 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { getToken } from "../utils/auth";
-import { useUser } from "../context/userContext";
+import TodoSkeleton from "../components/TodoSkeleton";
 
 function Home() {
   let [add, setAdd] = useState(false);
   let [loading, setLoading] = useState(true);
   let [todos, settodos] = useState([]);
   let token = getToken();
-  let { user } = useUser();
+  let [status, setStatus] = useState("all");
 
-  useEffect(() => {
-    const getTodolist = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_URL}/todolists`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  const getTodolist = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_URL}/todolists`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (response.ok) {
-          setLoading(false);
-          settodos(data.result);
-        } else if (response.status === 401) {
-          setLoading(false);
-        }
-      } catch (error) {
+      if (response.ok) {
         setLoading(false);
-        console.log(error);
+        settodos(data.result);
+      } else if (response.status === 401) {
+        setLoading(false);
       }
-    };
-
-    getTodolist();
-    console.log("fetch");
-  }, []);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     if (!token) {
       settodos([]);
+      return;
     }
+    getTodolist();
+    console.log("fetch");
   }, [token]);
 
-  const handleAddTask = () => {
-    setAdd(true);
-  };
+  const filteredTodos = todos.filter((todo) => {
+    if (status === "all") return true;
+    if (status === "completed") return todo.completed === true;
+    if (status === "doing") return todo.completed === false;
+    return true;
+  });
 
-  console.log(todos);
+  console.log(status);
 
   return (
     <section className="home-page">
-      {loading && (
-        <h2
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            fontStyle: "italic",
-          }}
-        >
-          Loading...
-        </h2>
+      {!add && (
+        <>
+          <button
+            className="todo-btn"
+            onClick={() => {
+              setAdd(true);
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} /> Add Task
+          </button>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "start",
+              alignItems: "center",
+              margin: "30px 0px 10px 0px",
+            }}
+          >
+            <button
+              className={`filter-btn ${
+                status === "all" ? "active-filter" : ""
+              }`}
+              onClick={() => setStatus("all")}
+            >
+              All tasks
+            </button>
+            <button
+              className={`filter-btn ${
+                status === "completed" ? "active-filter" : ""
+              }`}
+              onClick={() => {
+                setStatus("completed");
+              }}
+            >
+              Complete
+            </button>
+            <button
+              className={`filter-btn ${
+                status === "doing" ? "active-filter" : ""
+              }`}
+              onClick={() => {
+                setStatus("doing");
+              }}
+            >
+              Doing
+            </button>
+          </div>
+        </>
       )}
+
+      {loading && <TodoSkeleton count={5} />}
+
+      {add && (
+        <button className="todo-btn" onClick={() => setAdd(false)}>
+          <FontAwesomeIcon icon={faArrowRotateBackward} /> Back
+        </button>
+      )}
+
+      <br />
+      {add && <TodoForm setAdd={setAdd} settodos={settodos} />}
+
       {!loading && todos && (
         <>
-          {!add && (
-            <>
-              <button className="todo-btn" onClick={handleAddTask}>
-                <FontAwesomeIcon icon={faPlus} /> Add Task
-              </button>
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "start",
-                  alignItems: "center",
-                  margin: "30px 0px 0px 0px",
-                }}
-              >
-                <button
-                  className="filter-btn active-filter"
-                  onClick={handleAddTask}
-                >
-                  All tasks
-                </button>
-                <button className="filter-btn" onClick={handleAddTask}>
-                  Complete
-                </button>
-                <button className="filter-btn" onClick={handleAddTask}>
-                  Doing
-                </button>
-              </div>
-            </>
-          )}
-          {add && (
-            <button className="todo-btn" onClick={() => setAdd(false)}>
-              <FontAwesomeIcon icon={faArrowRotateBackward} /> Back
-            </button>
-          )}
-
-          <br />
-          {add && <TodoForm setAdd={setAdd} settodos={settodos} />}
-
           {!add &&
-            (todos.length === 0 ? (
+            (filteredTodos.length === 0 ? (
               <p className="empty-msg">No tasks yet. Add one!</p>
             ) : (
-              todos
+              filteredTodos
                 .filter(Boolean)
                 .map((todo) => <TodoList key={todo._id} todo={todo} />)
             ))}

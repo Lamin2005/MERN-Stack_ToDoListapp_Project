@@ -47,6 +47,42 @@ app.get("/todolists", authMiddleware, async (req, res) => {
   }
 });
 
+// app.get("/todolists/completed", authMiddleware, async (req, res) => {
+//   try {
+//     const todos = await Todo.find({
+//       user: req.user.id,
+//       completed: true,
+//     }).populate("user");
+//     console.log(todos);
+
+//     if (todos.length > 0) {
+//       res.json({ message: "Successfully Get Data...", result: todos });
+//     } else {
+//       res.json({ message: "No todolist available...", result: [] });
+//     }
+//   } catch (error) {
+//     res.json({ message: "Fail Get Data...", result: [] });
+//   }
+// });
+
+// app.get("/todolists/doing", authMiddleware, async (req, res) => {
+//   try {
+//     const todos = await Todo.find({
+//       user: req.user.id,
+//       completed: false,
+//     }).populate("user");
+//     console.log(todos);
+
+//     if (todos.length > 0) {
+//       res.json({ message: "Successfully Get Data...", result: todos });
+//     } else {
+//       res.json({ message: "No todolist available...", result: [] });
+//     }
+//   } catch (error) {
+//     res.json({ message: "Fail Get Data...", result: [] });
+//   }
+// });
+
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
 
