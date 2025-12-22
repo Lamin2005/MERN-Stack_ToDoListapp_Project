@@ -16,6 +16,33 @@ function Home() {
   let token = getToken();
   let [status, setStatus] = useState("all");
 
+  const toggleComplete = async (id, currentstatus) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_URL}/todolists/${id}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ completed: !currentstatus }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        settodos((prev) => prev.map((t) => (t._id === id ? data.result : t)));
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
+  };
+
   const getTodolist = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_URL}/todolists`, {
@@ -130,7 +157,13 @@ function Home() {
             ) : (
               filteredTodos
                 .filter(Boolean)
-                .map((todo) => <TodoList key={todo._id} todo={todo} />)
+                .map((todo) => (
+                  <TodoList
+                    key={todo._id}
+                    todo={todo}
+                    toggleComplete={toggleComplete}
+                  />
+                ))
             ))}
         </>
       )}

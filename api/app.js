@@ -46,24 +46,34 @@ app.get("/todolists", authMiddleware, async (req, res) => {
     res.json({ message: "Fail Get Data...", result: [] });
   }
 });
+app.patch("/todolists/:id/status", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { completed } = req.body;
 
-// app.get("/todolists/completed", authMiddleware, async (req, res) => {
-//   try {
-//     const todos = await Todo.find({
-//       user: req.user.id,
-//       completed: true,
-//     }).populate("user");
-//     console.log(todos);
+  try {
+    const updatedTodo = await Todo.findOneAndUpdate(
+      { _id: id, user: req.user.id }, // 🔒 security
+      { completed },
+      { new: true }
+    );
 
-//     if (todos.length > 0) {
-//       res.json({ message: "Successfully Get Data...", result: todos });
-//     } else {
-//       res.json({ message: "No todolist available...", result: [] });
-//     }
-//   } catch (error) {
-//     res.json({ message: "Fail Get Data...", result: [] });
-//   }
-// });
+    if (!updatedTodo) {
+      return res.status(404).json({
+        message: "Todo not found",
+      });
+    }
+
+    res.json({
+      message: "Todo completed status updated",
+      result: updatedTodo,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Fail to update completed status",
+    });
+  }
+});
 
 // app.get("/todolists/doing", authMiddleware, async (req, res) => {
 //   try {

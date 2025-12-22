@@ -1,6 +1,6 @@
 import "../assets/global.css";
 
-function TodoList({ todo }) {
+function TodoList({ todo, toggleComplete }) {
   return (
     <div className="todo-list-container">
       <div className={`todo-card ${todo.completed ? "completed" : ""}`}>
@@ -18,7 +18,7 @@ function TodoList({ todo }) {
         <div className="todo-actions">
           <button
             className="complete-btn"
-            onClick={() => toggleComplete(todo.id)}
+            onClick={() => toggleComplete(todo._id,todo.completed)}
           >
             Complete
           </button>
@@ -26,7 +26,7 @@ function TodoList({ todo }) {
           <button
             className="complete-btn"
             onClick={() => toggleComplete(todo.id)}
-          > 
+          >
             Edit
           </button>
 
