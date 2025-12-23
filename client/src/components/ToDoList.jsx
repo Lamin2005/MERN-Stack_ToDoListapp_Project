@@ -1,4 +1,5 @@
 import "../assets/global.css";
+import { NavLink } from "react-router-dom";
 
 function TodoList({ todo, toggleComplete }) {
   return (
@@ -18,17 +19,18 @@ function TodoList({ todo, toggleComplete }) {
         <div className="todo-actions">
           <button
             className="complete-btn"
-            onClick={() => toggleComplete(todo._id,todo.completed)}
+            onClick={() => toggleComplete(todo._id, todo.completed)}
           >
             Complete
           </button>
 
-          <button
+          <NavLink
             className="complete-btn"
-            onClick={() => toggleComplete(todo.id)}
+            style={{ textDecoration: "none" }}
+            to={`/todolists-edit/${todo._id}`}
           >
             Edit
-          </button>
+          </NavLink>
 
           <button className="delete-btn">Delete</button>
         </div>

@@ -7,6 +7,7 @@ import { UserProvider } from "./context/userContext";
 import Forgotpassword from "./pages/ForgotPassword";
 import OTP from "./pages/OTP";
 import ResetPassword from "./pages/ResetPassword";
+import Editpage from "./pages/Editpage";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,16 +29,20 @@ function App() {
         },
         {
           path: "forgotpassword",
-          element: < Forgotpassword/>,
+          element: <Forgotpassword />,
         },
         {
-          path:"verify-otp",
-          element:<OTP/>
+          path: "verify-otp",
+          element: <OTP />,
         },
         {
-          path:"reset-password",
-          element:<ResetPassword/>
-        }
+          path: "reset-password",
+          element: <ResetPassword />,
+        },
+        {
+          path: "/todolists-edit/:id",
+          element: <Editpage/>
+        },
       ],
     },
   ]);

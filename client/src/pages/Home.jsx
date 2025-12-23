@@ -15,6 +15,7 @@ function Home() {
   let [todos, settodos] = useState([]);
   let token = getToken();
   let [status, setStatus] = useState("all");
+  let [edit, setEdit] = useState("");
 
   const toggleComplete = async (id, currentstatus) => {
     try {
@@ -147,7 +148,7 @@ function Home() {
       )}
 
       <br />
-      {add && <TodoForm setAdd={setAdd} settodos={settodos} />}
+      {add && <TodoForm setAdd={setAdd} settodos={settodos} control={"add"} />}
 
       {!loading && todos && (
         <>
@@ -162,6 +163,7 @@ function Home() {
                     key={todo._id}
                     todo={todo}
                     toggleComplete={toggleComplete}
+                    setEdit={setEdit}
                   />
                 ))
             ))}

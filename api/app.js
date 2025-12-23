@@ -46,6 +46,7 @@ app.get("/todolists", authMiddleware, async (req, res) => {
     res.json({ message: "Fail Get Data...", result: [] });
   }
 });
+
 app.patch("/todolists/:id/status", authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { completed } = req.body;
@@ -75,23 +76,53 @@ app.patch("/todolists/:id/status", authMiddleware, async (req, res) => {
   }
 });
 
-// app.get("/todolists/doing", authMiddleware, async (req, res) => {
-//   try {
-//     const todos = await Todo.find({
-//       user: req.user.id,
-//       completed: false,
-//     }).populate("user");
-//     console.log(todos);
+app.get("/todolists-edit/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
 
-//     if (todos.length > 0) {
-//       res.json({ message: "Successfully Get Data...", result: todos });
-//     } else {
-//       res.json({ message: "No todolist available...", result: [] });
-//     }
-//   } catch (error) {
-//     res.json({ message: "Fail Get Data...", result: [] });
-//   }
-// });
+  try {
+    const todos = await Todo.findById(id).populate("user");
+
+    if (todos) {
+      res.status(200).json({ message: "Successfully get Data", result: todos });
+    } else {
+      res.status(400).json({ message: "Fail get Data", result: [] });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error", result: error });
+  }
+});
+
+app.put("/todolists-edit/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { title, description, priority } = req.body;
+
+  try {
+    const updatedTodo = await Todo.findOneAndUpdate(
+      { _id: id, user: req.user.id }, // 🔒 only owner
+      {
+        title,
+        description,
+        priority,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTodo) {
+      return res.status(404).json({
+        message: "Todo not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Todo updated successfully",
+      result: updatedTodo,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Fail to update todo",
+    });
+  }
+});
 
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
@@ -145,7 +176,7 @@ app.get("/profile", authMiddleware, async (req, res) => {
   }
 });
 
-app.post("/todos", authMiddleware, async (req, res) => {
+app.post("/todolists", authMiddleware, async (req, res) => {
   const { title, description, priority } = req.body;
   const user = req.user;
   console.log(user);
