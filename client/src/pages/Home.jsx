@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import { getToken } from "../utils/auth";
 import TodoSkeleton from "../components/TodoSkeleton";
+import { useUser } from "../context/userContext";
 
 function Home() {
   let [add, setAdd] = useState(false);
@@ -15,7 +16,7 @@ function Home() {
   let [todos, settodos] = useState([]);
   let token = getToken();
   let [status, setStatus] = useState("all");
-  let [edit, setEdit] = useState("");
+  let { user } = useUser();
 
   const toggleComplete = async (id, currentstatus) => {
     try {
@@ -71,11 +72,12 @@ function Home() {
   useEffect(() => {
     if (!token) {
       settodos([]);
+      setLoading(false);
       return;
     }
     getTodolist();
     console.log("fetch");
-  }, [token]);
+  }, [add, user]);
 
   const filteredTodos = todos.filter((todo) => {
     if (status === "all") return true;
@@ -83,6 +85,32 @@ function Home() {
     if (status === "doing") return todo.completed === false;
     return true;
   });
+
+  const deleteTodo = async (id) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_URL}/todolists/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        settodos((prev) => prev.filter((t) => t._id !== id));
+        alert(data.message);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
+  };
 
   console.log(status);
 
@@ -148,7 +176,7 @@ function Home() {
       )}
 
       <br />
-      {add && <TodoForm setAdd={setAdd} settodos={settodos} control={"add"} />}
+      {add && <TodoForm setAdd={setAdd} settodos={settodos} />}
 
       {!loading && todos && (
         <>
@@ -163,7 +191,7 @@ function Home() {
                     key={todo._id}
                     todo={todo}
                     toggleComplete={toggleComplete}
-                    setEdit={setEdit}
+                    deleteTodo={deleteTodo}
                   />
                 ))
             ))}

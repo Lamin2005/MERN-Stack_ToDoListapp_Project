@@ -3,13 +3,13 @@ import "../assets/global.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { getToken } from "../utils/auth";
 
-function TodoForm({ setAdd, settodos, control }) {
+function TodoForm({ setAdd, settodos }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
   const navigate = useNavigate();
-  let [editMode, setEditMode] = useState(control === "edit" ? true : false);
   let { id } = useParams();
+  let [editMode, setEditMode] = useState(id ? true : false);
   const token = getToken();
 
   const addTodo = async () => {
@@ -67,6 +67,7 @@ function TodoForm({ setAdd, settodos, control }) {
 
       if (res.ok) {
         alert(data.message);
+        setEditMode(false);
         navigate("/");
       } else {
         alert(data.message);
@@ -119,7 +120,10 @@ function TodoForm({ setAdd, settodos, control }) {
   };
 
   useEffect(() => {
-    getTodolist();
+    if (editMode && id) {
+      getTodolist();
+      return;
+    }
   }, [editMode, id]);
 
   return (

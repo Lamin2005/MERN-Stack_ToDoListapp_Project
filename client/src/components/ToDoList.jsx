@@ -1,7 +1,7 @@
 import "../assets/global.css";
 import { NavLink } from "react-router-dom";
 
-function TodoList({ todo, toggleComplete }) {
+function TodoList({ todo, toggleComplete, deleteTodo }) {
   return (
     <div className="todo-list-container">
       <div className={`todo-card ${todo.completed ? "completed" : ""}`}>
@@ -32,7 +32,9 @@ function TodoList({ todo, toggleComplete }) {
             Edit
           </NavLink>
 
-          <button className="delete-btn">Delete</button>
+          <button className="delete-btn" onClick={() => deleteTodo(todo._id)}>
+            Delete
+          </button>
         </div>
       </div>
     </div>

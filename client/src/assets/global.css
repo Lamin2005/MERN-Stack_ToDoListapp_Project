@@ -448,6 +448,7 @@
     margin-top: 12px;
     color: #9feeff;
     font-size: 15px;
+    margin-bottom: 20px;
 }
 
 .profile-joined span {
@@ -457,11 +458,12 @@
 
 /* Edit Button */
 .edit-btn {
-    margin-top: 22px;
+    margin-top: 32px;
     padding: 10px 25px;
     font-size: 16px;
     border: none;
     border-radius: 10px;
+    position: relative;
 
     background: #c400ff;
     color: #fff;

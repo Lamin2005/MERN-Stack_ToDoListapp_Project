@@ -4,7 +4,7 @@ import TodoForm from "../components/ToDoForm";
 function Editpage() {
   return (
     <>
-      <TodoForm control={"edit"} />
+      <TodoForm />
     </>
   );
 }

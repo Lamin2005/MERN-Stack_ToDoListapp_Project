@@ -1,10 +1,10 @@
+import { NavLink } from "react-router-dom";
 import "../assets/global.css";
 import { useUser } from "../context/userContext";
 
 function Profile() {
-  const {user} = useUser();
-
-  if(!user){
+  const { user } = useUser();
+  if (!user) {
     return;
   }
 
@@ -25,7 +25,13 @@ function Profile() {
           Joined: <span>{user.createAt}</span>
         </p>
 
-        <button className="edit-btn">Edit Profile</button>
+        <NavLink
+          to={`/profile-edit/${user._id}`}
+          className="edit-btn"
+          style={{ textDecoration: "none" }}
+        >
+          Edit Profile
+        </NavLink>
       </div>
     </div>
   );

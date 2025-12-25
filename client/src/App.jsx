@@ -8,6 +8,7 @@ import Forgotpassword from "./pages/ForgotPassword";
 import OTP from "./pages/OTP";
 import ResetPassword from "./pages/ResetPassword";
 import Editpage from "./pages/Editpage";
+import ProfileEditpage from "./pages/ProfileEditpage";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,6 +29,10 @@ function App() {
           element: <Profile />,
         },
         {
+          path: "/profile-edit/:id",
+          element: <ProfileEditpage />,
+        },
+        {
           path: "forgotpassword",
           element: <Forgotpassword />,
         },
@@ -41,7 +46,7 @@ function App() {
         },
         {
           path: "/todolists-edit/:id",
-          element: <Editpage/>
+          element: <Editpage />,
         },
       ],
     },

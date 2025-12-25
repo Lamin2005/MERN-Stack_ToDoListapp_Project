@@ -33,7 +33,9 @@ mongoose
 
 app.get("/todolists", authMiddleware, async (req, res) => {
   try {
-    const todos = await Todo.find({ user: req.user.id }).populate("user");
+    const todos = await Todo.find({ user: req.user.id })
+      .populate("user")
+      .sort({ createdAt: -1 });
 
     console.log(todos);
 
@@ -124,6 +126,24 @@ app.put("/todolists-edit/:id", authMiddleware, async (req, res) => {
   }
 });
 
+app.delete("/todolists/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedTodo = await Todo.findOneAndDelete({
+      _id: id,
+      user: req.user.id,
+    });
+    if (!deletedTodo) {
+      return res.status(404).json({ message: "Todo not found" });
+    }
+    res.status(200).json({ message: "Todo deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting todo", error: error.message });
+  }
+});
+
 app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
 
@@ -173,6 +193,47 @@ app.get("/profile", authMiddleware, async (req, res) => {
     res.status(200).json({ message: "Get User successfully", result: user });
   } catch (err) {
     res.status(500).json({ message: "Error get Proile ", error: err.message });
+  }
+});
+
+app.get("/profile/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    res.status(200).json({ message: "Get User successfully", result: user });
+  } catch (err) {
+    res.status(500).json({ message: "Error get Proile ", error: err.message });
+  }
+});
+
+app.patch("/profile-edit/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  let { email, password, priority } = req.body;
+
+  const hashpassword = await Password.encode(password);
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: id },
+      {
+        email,
+        hashpassword,
+        priority,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "No Found user" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User's Profile Update Successfully ", result: user });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", result: error.message });
   }
 });
 
