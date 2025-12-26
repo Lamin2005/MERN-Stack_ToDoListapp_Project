@@ -20,7 +20,7 @@ app.use(
   })
 );
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("mongodb connect successfully...");
     app.listen(process.env.PORT, () => {
@@ -208,7 +208,7 @@ app.get("/profile/:id", authMiddleware, async (req, res) => {
 
 app.patch("/profile-edit/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
-  let { email, password, priority } = req.body;
+  let { email, password } = req.body;
 
   const hashpassword = await Password.encode(password);
 
@@ -217,8 +217,7 @@ app.patch("/profile-edit/:id", authMiddleware, async (req, res) => {
       { _id: id },
       {
         email,
-        hashpassword,
-        priority,
+        password: hashpassword,
       },
       { new: true, runValidators: true }
     );
